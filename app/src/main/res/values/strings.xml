@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">News</string>
     <string name="github_logo">github_logo</string>
-    <string name="enter_a_topic_or_keyword">Enter a topic or keyword</string>
+    <string name="type_here">Type here…</string>
     <string name="search">Search</string>
     <string name="all">All</string>
+    <string name="thumbnail">thumbnail</string>
 </resources>
