@@ -2,15 +2,12 @@ package com.example.news
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Binder
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.InputBinding
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -24,8 +21,6 @@ import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.bumptech.glide.load.engine.GlideException
-import javax.sql.DataSource
 
 
 class MainActivity : AppCompatActivity(), NewsItemClicked {
@@ -67,11 +62,15 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
         recyclerView.adapter = mAdapter
 
         // search input and search query
-        var searchText = search.text
+        val searchText = search.text
 
         searchButton.setOnClickListener {
-            url = "https://newsapi.org/v2/everything?q=$searchText&lang=en&sortBy=publishedAt&$apiKey"
-            fetchData()
+            if (search.text.isEmpty()) {
+                Toast.makeText(this, "Please enter a search query", Toast.LENGTH_SHORT).show()
+            } else {
+                url = "https://newsapi.org/v2/everything?q=$searchText&lang=en&sortBy=publishedAt&$apiKey"
+                fetchData()
+            }
         }
 
         homeButton.setOnClickListener {
@@ -115,7 +114,8 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                         newsJsonObject.getString("title"),
                         newsJsonObject.getString("author"),
                         newsJsonObject.getString("url"),
-                        newsJsonObject.getString("urlToImage")
+                        newsJsonObject.getString("urlToImage"),
+
                     )
 
                     newsArray.add(news)
