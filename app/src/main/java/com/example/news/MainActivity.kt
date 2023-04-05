@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                         newsJsonObject.getString("author"),
                         newsJsonObject.getString("url"),
                         newsJsonObject.getString("urlToImage"),
-
+                        newsJsonObject.getJSONObject("source").getString("name")
                     )
 
                     newsArray.add(news)
