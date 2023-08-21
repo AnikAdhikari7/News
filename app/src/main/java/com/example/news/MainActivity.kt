@@ -8,15 +8,20 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ListView
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Orientation
 import com.android.volley.AuthFailureError
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -33,6 +38,9 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
     private val apiKey = "apiKey=d01edbc3c3b74d13bda7c02182817c26"
     private var url = "https://newsapi.org/v2/top-headlines?country=in&lang=en&sortBy=publishedAt&$apiKey"
 
+    private val homeURL = "https://newsapi.org/v2/top-headlines?country=in&lang=en&sortBy=publishedAt&$apiKey"
+
+    private var listItem = ArrayList<CategoryDataClass>()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,11 +48,10 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
         setContentView(R.layout.activity_main)
 
         // findViewById
-        //val categoriesRecyclerView = findViewById<RecyclerView>(R.id.categoriesRecyclerView)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val search = findViewById<EditText>(R.id.etSearch)
         val searchButton = findViewById<Button>(R.id.btSearchButton)
-        val homeButton = findViewById<ImageButton>(R.id.btHome)
+        val categoryRecyclerView = findViewById<RecyclerView>(R.id.categoryRecyclerView)
         progressBar = findViewById(R.id.pbProgressBar)
 
 
@@ -56,27 +63,47 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
         actionBar.setDisplayShowHomeEnabled(true)
 
 
+
+        // category
+        categoryRecyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+
+        val categories = arrayOf("Latest", "Business", "Entertainment", "General", "Health", "Science", "Sports", "Technology")
+
+        for (category in categories) {
+            val items = CategoryDataClass(category)
+            listItem.add(items)
+        }
+
+        categoryRecyclerView.adapter = CategoryDataAdapter(listItem)
+
+
+
+
         // api call function
-        fetchData()
+        fetchData(url)
+
+
         mAdapter = NewsListAdapter(this)
         recyclerView.adapter = mAdapter
 
+
         // search input and search query
         val searchText = search.text
+
 
         searchButton.setOnClickListener {
             if (search.text.isEmpty()) {
                 Toast.makeText(this, "Please enter a search query", Toast.LENGTH_SHORT).show()
             } else {
                 url = "https://newsapi.org/v2/everything?q=$searchText&lang=en&sortBy=publishedAt&$apiKey"
-                fetchData()
+                fetchData(url)
             }
         }
 
-        homeButton.setOnClickListener {
-            url = "https://newsapi.org/v2/top-headlines?country=in&lang=en&sortBy=publishedAt&$apiKey"
-            fetchData()
-        }
+//        homeButton.setOnClickListener {
+//            url = "https://newsapi.org/v2/top-headlines?country=in&lang=en&sortBy=publishedAt&$apiKey"
+//            fetchData(url)
+//        }
     }
 
     // menu
@@ -99,7 +126,7 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
 
 
     // api call
-    private fun fetchData() {
+    private fun fetchData(url : String = homeURL) {
         progressBar.visibility = View.VISIBLE
 
         // Instantiate the RequestQueue.
@@ -115,6 +142,7 @@ class MainActivity : AppCompatActivity(), NewsItemClicked {
                         newsJsonObject.getString("author"),
                         newsJsonObject.getString("url"),
                         newsJsonObject.getString("urlToImage"),
+                        newsJsonObject.getJSONObject("source").getString("name")
 
                     )
 
